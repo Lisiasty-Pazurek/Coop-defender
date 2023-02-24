@@ -325,8 +325,8 @@ MonoBehaviour:
   autoStartServerBuild: 1
   autoConnectClientBuild: 0
   sendRate: 30
-  offlineScene: Assets/Mirror/Examples/Room/Scenes/OfflineScene.unity
-  onlineScene: Assets/Mirror/Examples/Room/Scenes/RoomScene.unity
+  offlineScene: Assets/Scenes/OfflineScene.unity
+  onlineScene: Assets/Scenes/RoomScene.unity
   transport: {fileID: 2008127830}
   networkAddress: localhost
   maxConnections: 5
@@ -340,7 +340,7 @@ MonoBehaviour:
   showRoomGUI: 1
   minPlayers: 1
   roomPlayerPrefab: {fileID: 114033720796874720, guid: deae2134a1d77704b9c595efe69767dd, type: 3}
-  RoomScene: Assets/Mirror/Examples/Room/Scenes/RoomScene.unity
+  RoomScene: Assets/Scenes/RoomScene.unity
   GameplayScene: Assets/Scenes/OnlineScene.unity
   _allPlayersReady: 1
   roomSlots: []
