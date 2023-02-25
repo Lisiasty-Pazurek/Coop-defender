@@ -8,10 +8,12 @@ public class PlayerController : NetworkBehaviour
 {   
     [SerializeField] public int playerHealth = 5;
     [SerializeField] private float movementSpeed = 5f;
-    [SerializeField] private float rotationSpeed = 10f;
-    [SerializeField] private float jumpForce = 6f;
+    [SerializeField] private float rotationSpeed = 6f;
+    [SerializeField] private float jumpForce = 8f;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform bulletSpawnPoint;
+    [SerializeField] private float reloadTime = .2f;
+    private float reloadCD;
 
     private Rigidbody rb;
     private Camera cam;
@@ -41,6 +43,8 @@ public class PlayerController : NetworkBehaviour
         {
             CmdFire();
         }
+
+        reloadCD -= Time.deltaTime;
     }
 
     private void FixedUpdate()
@@ -91,6 +95,8 @@ public class PlayerController : NetworkBehaviour
     [Command]
     public void CmdFire()
     {
+        if (reloadCD <= 0) 
+        {
         // Diff weapons = diff bullets. New class might be usefull, also.. shooting cooldown 
         // Instantiate bullet prefab at spawn point position and rotation
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
@@ -100,6 +106,9 @@ public class PlayerController : NetworkBehaviour
 
         // Spawn bullet on clients
         NetworkServer.Spawn(bullet);
+        reloadCD = reloadTime;
+        }
+
     }
 
     [Server]

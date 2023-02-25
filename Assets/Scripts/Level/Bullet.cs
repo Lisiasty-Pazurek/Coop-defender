@@ -7,6 +7,8 @@ public class Bullet : NetworkBehaviour
 {
     [SerializeField] public float bulletSpeed = 100f;
     [SerializeField] private float bulletLifetime = 3f;
+    [SerializeField] private int damageAmount = 1;
+    [SerializeField] private bool canDamagePlayer = false;
 
     private float bulletTimer = 0f;
 
@@ -15,6 +17,8 @@ public class Bullet : NetworkBehaviour
         base.OnStartServer();
         // Set bullet timer to zero when bullet is spawned
         bulletTimer = 0f;
+
+        // Bullet ownership reference for scoring a point and any other usual stuff
     }
 
     private void FixedUpdate()
@@ -25,27 +29,27 @@ public class Bullet : NetworkBehaviour
         // Destroy bullet after a certain amount of time
         if (bulletTimer >= bulletLifetime)
         {
-            Destroy(gameObject);
+            NetworkServer.Destroy(gameObject);
         }
     }
 
     [ServerCallback]
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter(Collider other)
     {
         // Check if bullet collided with a player
         PlayerController player = other.gameObject.GetComponent<PlayerController>();
-        if (player != null)
+        if (canDamagePlayer && player != null)
         {
             // Apply damage to the player 
-            player.TakeDamage(1);
+            player.TakeDamage(damageAmount);
         }
-        // Enemy enemy = other.GetComponent<Enemy>();
-        // if (enemy != null)
-        // {
-        //     // Apply damage to the enemy 
-        //     enemy.TakeDamage(1);
-        // }
+        Enemy enemy = other.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            // Apply damage to the enemy 
+             enemy.TakeDamage(damageAmount);
+        }
 
-        Destroy(gameObject);
+        NetworkServer.Destroy(gameObject);
     }
 }

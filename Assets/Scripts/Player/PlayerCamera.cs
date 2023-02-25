@@ -6,7 +6,6 @@ using Cinemachine;
     public class PlayerCamera : MonoBehaviour
     {
         private Camera mainCam;
- //       private GameObject gameCamera; // not needed for now
         private CinemachineVirtualCamera cineCam;
 
         public void Start ()
@@ -18,10 +17,10 @@ using Cinemachine;
         {
             Debug.Log("Setting up camera controllers");
             mainCam = Camera.main;
-                cineCam = mainCam.GetComponent<CinemachineVirtualCamera>();
-                mainCam.orthographic = false;
-                cineCam.Follow = this.transform;
-                Debug.Log("cinemachine cam follow set up for local client");
+            cineCam = mainCam.GetComponent<CinemachineVirtualCamera>();
+//          mainCam.orthographic = false; // let's change it through inspector, not necessary for now 
+            cineCam.Follow = this.transform;
+            Debug.Log("cinemachine cam follow set up for local client");
         }
 
     }
