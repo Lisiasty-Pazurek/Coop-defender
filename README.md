@@ -1,2 +1,2 @@
 # Coop-defender
- Practice coop tower defense game
+ Practice coop twin stick shooter
