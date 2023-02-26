@@ -148,6 +148,7 @@ GameObject:
   - component: {fileID: 6223180428799467715}
   - component: {fileID: -1266684619568618356}
   - component: {fileID: 5879898095129043468}
+  - component: {fileID: 4495762874281454135}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -208,11 +209,11 @@ MonoBehaviour:
   playerHealth: 5
   movementSpeed: 3
   rotationSpeed: 3
-  jumpForce: 25
   reloadTime: 0.4
   bulletPrefab: {fileID: 945784786697987653, guid: 7455f6066933281469d28ff832f452bf, type: 3}
   bulletSpawnPoint: {fileID: 5154872357061691754}
   uiHandler: {fileID: 0}
+  pcAnimator: {fileID: 0}
   isReady: 0
 --- !u!54 &3161827005819108190
 Rigidbody:
@@ -349,13 +350,33 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6239893102336994761}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ffdb7bd2c4d89ef42b1fd556e2b92b60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   pcAnimator: {fileID: 0}
+--- !u!95 &4495762874281454135
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6239893102336994761}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 4837235d67e136e4b883adb2bafc73e8, type: 3}
+  m_Controller: {fileID: 9100000, guid: 7a9f599c49797434485c0e1d9e99f200, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!1001 &5768001453424380062
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -412,9 +433,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 95474626191974340, guid: 15a550206f811c346b37f3a3f4495178, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 95474626191974340, guid: 15a550206f811c346b37f3a3f4495178, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 379bb3423a7282241a9381645076ae57, type: 2}
+      objectReference: {fileID: 9100000, guid: 7a9f599c49797434485c0e1d9e99f200, type: 2}
     - target: {fileID: 95474626191974340, guid: 15a550206f811c346b37f3a3f4495178, type: 3}
       propertyPath: m_WarningMessage
       value: 
@@ -452,7 +477,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5769037142990595714}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30b43ea742fe98141a66a59c3eca2700, type: 3}
   m_Name: 

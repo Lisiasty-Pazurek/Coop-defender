@@ -21,6 +21,7 @@ public class PlayerMovementController : NetworkBehaviour
     private Rigidbody rb;
     private Camera cam;
 //    public GameSession gameSession;
+    public Animator pcAnimator;
 
     private float reloadCD;
     public bool isReady = false;
@@ -33,6 +34,7 @@ public class PlayerMovementController : NetworkBehaviour
         // Get reference to main camera and set it to follow the player
         cam = Camera.main;
         FindObjectOfType<GameSession>().playerController = this;
+        pcAnimator =GetComponent<Animator>();
 
         // Disable cursor and hide it - not necessary, can be useful for nice looking one 
         // Cursor.lockState = CursorLockMode.Locked;
@@ -69,8 +71,12 @@ public class PlayerMovementController : NetworkBehaviour
         Vector3 movement = new Vector3(moveHorizontal , 0f, moveVertical ) * movementSpeed;
         // make it relative to camera rotation
         movement = cam.transform.TransformDirection(movement);
-        // Apply movement to rigidbody
-        rb.MovePosition(transform.position + movement * Time.deltaTime);
+
+        //cheesy workaround for animation, looks good aaand need lot more work
+        pcAnimator.SetFloat("Speed", Vector3.Dot(gameObject.transform.forward, movement));
+
+        // Apply movement to rigidbody, looks bad works good
+//        rb.MovePosition(transform.position + movement * Time.deltaTime);
 
         // Cast a ray from the camera to the mouse position
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
