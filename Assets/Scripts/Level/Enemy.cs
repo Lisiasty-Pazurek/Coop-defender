@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Mirror;
 
+namespace MirrorBasics {
 public class Enemy : NetworkBehaviour
 {
     [Header ("Settings")]
@@ -158,5 +159,6 @@ public class Enemy : NetworkBehaviour
             lastShooter = bullet.shooter;
         }
     }
+}
 
 }

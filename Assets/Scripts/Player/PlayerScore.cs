@@ -2,6 +2,7 @@ using UnityEngine;
 using Mirror;
 using System;
 
+namespace MirrorBasics {
 public class PlayerScore : NetworkBehaviour
     {
     [SyncVar] public int index;
@@ -9,7 +10,7 @@ public class PlayerScore : NetworkBehaviour
     [SyncVar (hook = nameof(ScoreChange))] public int score;
     public UIHandler uiHandler;
 
-    public void Start()
+    public override void OnStartLocalPlayer()
     {
         
         uiHandler = this.GetComponentInParent<PlayerMovementController>().uiHandler;
@@ -21,6 +22,6 @@ public class PlayerScore : NetworkBehaviour
         uiHandler.ChangeScore(score.ToString());
     }
 
-
+    }
 }
 

@@ -21,6 +21,6 @@ public class UIHandler : MonoBehaviour
 
     public void RestartLevel ()
     {
-        FindObjectOfType<NetworkRoomManagerExt>().ServerChangeScene(FindObjectOfType<NetworkRoomManagerExt>().RoomScene);
+        //FindObjectOfType<NetworkRoomManagerExt>().ServerChangeScene(FindObjectOfType<NetworkRoomManagerExt>().RoomScene);
     } 
 }

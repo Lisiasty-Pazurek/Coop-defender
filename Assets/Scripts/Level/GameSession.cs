@@ -5,6 +5,9 @@ using Mirror;
 using UnityEngine.UI;
 using System;
 
+
+namespace MirrorBasics
+{
 public class GameSession : NetworkBehaviour
 {
     [Header("Game Settings")]
@@ -18,10 +21,14 @@ public class GameSession : NetworkBehaviour
     private float gameTimer;
     public bool gameEnded;
 
+
     public Canvas postGameWindow;
 
     [Header("References")]
     public PlayerMovementController playerController;
+    [SyncVar]public Match currentMatch;
+    LevelController levelController;
+
 
 
     public override void OnStartServer()
@@ -35,11 +42,13 @@ public class GameSession : NetworkBehaviour
         countdownTimer = countdownDuration;
         gameTimer = gameDuration;
         gameEnded = false;
+        currentMatch = FindObjectOfType<LevelController>().currentMatch;
     }
 
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
+        // playerController = 
         
     }
 
@@ -147,4 +156,5 @@ public class GameSession : NetworkBehaviour
             }
         }
     }
+}
 }

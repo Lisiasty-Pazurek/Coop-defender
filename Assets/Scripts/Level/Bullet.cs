@@ -18,6 +18,7 @@ public class Bullet : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
+        this.GetComponent<NetworkMatch>().matchId = shooter.GetComponent<NetworkMatch>().matchId ;
         // Set bullet timer to zero when bullet is spawned
         bulletTimer = 0f;
 

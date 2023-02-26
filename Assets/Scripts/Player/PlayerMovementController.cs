@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-
+namespace MirrorBasics {
 public class PlayerMovementController : NetworkBehaviour
 {   
     [Header ("Settings")]
@@ -18,6 +18,7 @@ public class PlayerMovementController : NetworkBehaviour
 
     [Header ("References")]
     public UIHandler uiHandler;
+    public UIGameplay uiGameplay;
     private Rigidbody rb;
     private Camera cam;
 //    public GameSession gameSession;
@@ -33,9 +34,14 @@ public class PlayerMovementController : NetworkBehaviour
 
         // Get reference to main camera and set it to follow the player
         cam = Camera.main;
-        FindObjectOfType<GameSession>().playerController = this;
-        pcAnimator =GetComponent<Animator>();
-
+  //      FindObjectOfType<GameSession>().playerController = this; // have to add this after level starts
+        pcAnimator = gameObject.GetComponent<Animator>();
+        uiGameplay = FindObjectOfType<UIGameplay>();
+        uiGameplay.player = this;
+        
+        //Get some basic references for rb and ui handler
+        rb = GetComponent<Rigidbody>();
+        uiHandler = GameObject.FindObjectOfType<UIHandler>();
         // Disable cursor and hide it - not necessary, can be useful for nice looking one 
         // Cursor.lockState = CursorLockMode.Locked;
         // Cursor.visible = false;
@@ -43,9 +49,7 @@ public class PlayerMovementController : NetworkBehaviour
 
     private void Start()
     {
-        //Get some basic references for rb and ui handler
-        rb = GetComponent<Rigidbody>();
-        uiHandler = GameObject.FindObjectOfType<UIHandler>();
+
     }
 
     private void Update() 
@@ -167,5 +171,5 @@ public class PlayerMovementController : NetworkBehaviour
         
     }
 
-    
+}
 }

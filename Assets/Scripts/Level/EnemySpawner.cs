@@ -4,6 +4,8 @@ using UnityEngine;
 using Mirror;
 using System.Linq;
 
+
+namespace MirrorBasics {
 public class EnemySpawner : NetworkBehaviour
 {
     [SerializeField] public GameObject enemyPrefab;
@@ -11,6 +13,7 @@ public class EnemySpawner : NetworkBehaviour
     [SerializeField] public int  maxEnemies = 10;
     [SerializeField] [SyncVar]public int numEnemies = 0;
     [SerializeField] List<Transform> enemySpawnPoints;
+    LevelController levelController;
 
     public GameSession session;
 
@@ -19,8 +22,9 @@ public class EnemySpawner : NetworkBehaviour
     // Start spawning enemies when the game starts
     public override void OnStartServer()
     {
-        StartCoroutine(SpawnEnemyCoroutine());
+        levelController = FindObjectOfType<LevelController>();
         session = FindObjectOfType<GameSession>();
+        StartCoroutine(SpawnEnemyCoroutine());
     }
 
     private void Update ()
@@ -30,6 +34,7 @@ public class EnemySpawner : NetworkBehaviour
     }
 
     // Coroutine ends after spawning 10th enemy so need to be restarted once 10th enemy dies
+    [Server]
     private IEnumerator SpawnEnemyCoroutine()
     {
         
@@ -44,12 +49,15 @@ public class EnemySpawner : NetworkBehaviour
             {   
                 if (session.gameEnded) {yield break;}
                 GameObject enemy = Instantiate(enemyPrefab,enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count)]);
+                enemy.GetComponent<NetworkMatch>().matchId =  levelController.GetComponent<NetworkMatch>().matchId;
                 NetworkServer.Spawn(enemy);
+                
             }
        
         }
 
     }
+}
 }
 
 

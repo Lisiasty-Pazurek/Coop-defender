@@ -111,6 +111,7 @@ GameObject:
   - component: {fileID: 3877342082762489319}
   - component: {fileID: 1556173152722626740}
   - component: {fileID: 3389846007363505639}
+  - component: {fileID: -8673024106940047474}
   m_Layer: 0
   m_Name: EnemyBullet
   m_TagString: Untagged
@@ -180,11 +181,12 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
-  bulletSpeed: 200
   bulletLifetime: 1
+  bulletSpeed: 200
   damageAmount: 1
   canDamagePlayer: 1
   canDamageEnemy: 0
+  shooter: {fileID: 0}
 --- !u!54 &3389846007363505639
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -201,3 +203,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &-8673024106940047474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945784786697987653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d17e718851449a6879986e45c458fb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
