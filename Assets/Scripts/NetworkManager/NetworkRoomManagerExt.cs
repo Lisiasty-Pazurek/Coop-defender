@@ -1,18 +1,15 @@
 using UnityEngine;
+using Mirror;
+using UnityEngine.UI;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
 	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkManager.html
 */
 
-namespace Mirror.Examples.NetworkRoom
-{
     [AddComponentMenu("")]
     public class NetworkRoomManagerExt : NetworkRoomManager
     {
-        [Header("Spawner Setup")]
-        [Tooltip("Reward Prefab for the Spawner")]
-        public GameObject rewardPrefab;
 
         public static new NetworkRoomManagerExt singleton { get; private set; }
 
@@ -96,4 +93,4 @@ namespace Mirror.Examples.NetworkRoom
             }
         }
     }
-}
+

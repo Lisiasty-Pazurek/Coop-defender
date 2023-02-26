@@ -4,20 +4,27 @@ using UnityEngine;
 using Mirror;
 
 
-public class PlayerController : NetworkBehaviour
+public class PlayerMovementController : NetworkBehaviour
 {   
-    [SerializeField] public int playerHealth = 5;
+    [Header ("Settings")]
+    [SerializeField] [SyncVar] public int playerHealth = 5;
     [SerializeField] private float movementSpeed = 5f;
     [SerializeField] private float rotationSpeed = 6f;
-    [SerializeField] private float jumpForce = 8f;
+    [SerializeField] private float reloadTime = .2f;
+
+    [Header ("Prefabs")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform bulletSpawnPoint;
-    [SerializeField] private float reloadTime = .2f;
-    private float reloadCD;
 
+    [Header ("References")]
+    public UIHandler uiHandler;
     private Rigidbody rb;
     private Camera cam;
-    [SerializeField] private bool isGrounded; //debugging
+//    public GameSession gameSession;
+
+    private float reloadCD;
+    public bool isReady = false;
+    private bool isGrounded; //something is bugged
 
     public override void OnStartLocalPlayer()
     {
@@ -25,21 +32,24 @@ public class PlayerController : NetworkBehaviour
 
         // Get reference to main camera and set it to follow the player
         cam = Camera.main;
+        FindObjectOfType<GameSession>().playerController = this;
 
-        // Disable cursor and hide it - not exactly necessary 
+        // Disable cursor and hide it - not necessary, can be useful for nice looking one 
         // Cursor.lockState = CursorLockMode.Locked;
         // Cursor.visible = false;
     }
 
     private void Start()
     {
+        //Get some basic references for rb and ui handler
         rb = GetComponent<Rigidbody>();
+        uiHandler = GameObject.FindObjectOfType<UIHandler>();
     }
 
     private void Update() 
     {
         // Check for shooting input
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && isReady)
         {
             CmdFire();
         }
@@ -49,7 +59,7 @@ public class PlayerController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!isLocalPlayer)  { return;}
+        if (!isLocalPlayer || !isReady)  { return;}
 
         // Get input from horizontal and vertical axes
         float moveHorizontal = Input.GetAxis("Horizontal");
@@ -68,7 +78,9 @@ public class PlayerController : NetworkBehaviour
         // Declare a RaycastHit variable to store information about the hit
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit))
+
+
+        if (Physics.Raycast(ray, out hit, 100f, 7))
         {
             // Get the direction to the hit point
             Vector3 rotation = hit.point - transform.position;
@@ -85,11 +97,6 @@ public class PlayerController : NetworkBehaviour
         // Check if player is on the ground
         isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
 
-        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
-        {
-            // Apply jump force to rigidbody - nat workin yet
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
     }
 
     [Command]
@@ -103,7 +110,7 @@ public class PlayerController : NetworkBehaviour
 
         // Apply force to bullet in the direction the player is facing
         bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bullet.GetComponent<Bullet>().bulletSpeed);
-
+        bullet.GetComponent<Bullet>().shooter = this.gameObject;
         // Spawn bullet on clients
         NetworkServer.Spawn(bullet);
         reloadCD = reloadTime;
@@ -111,10 +118,48 @@ public class PlayerController : NetworkBehaviour
 
     }
 
-    [Server]
-    public void TakeDamage(int amount)
+    private void OnTriggerEnter(Collider other)
     {
-        playerHealth -= amount;
+        //Check if get hit by bullet
+        if (other.GetComponent<Bullet>() != null)
+        {
+            Bullet bullet = other.GetComponent<Bullet>();
+            if (bullet.canDamagePlayer)
+            // Apply damage to player 
+            TakeDamage(bullet.damageAmount);
+        }
     }
+
+    [Server]
+    void TakeDamage(int amount)
+    {
+        if (!isReady) {return;}
+        playerHealth -= amount;
+        uiHandler.ChangeHealth(playerHealth.ToString());
+        if (playerHealth <= 0)
+        {   
+            StartCoroutine(PlayerWounded());
+        }
+    }
+
+    // Death/healing/respawn
+    [Server]
+    public IEnumerator PlayerWounded()
+    {
+        isReady = false;
+
+        // need some visual feedback with animator but works as intended
+        while (isReady == false)
+        {
+            yield return new WaitForSeconds(6f); 
+            
+            isReady = true;
+        }
+
+        playerHealth = 5;
+        uiHandler.ChangeHealth(playerHealth.ToString());
+        
+    }
+
     
 }

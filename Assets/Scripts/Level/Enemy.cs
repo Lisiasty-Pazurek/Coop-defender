@@ -6,54 +6,87 @@ using Mirror;
 
 public class Enemy : NetworkBehaviour
 {
+    [Header ("Settings")]
     [SerializeField] [SyncVar] public int enemyHealth = 3;
+    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] Transform bulletSpawnPoint;
+    [SerializeField] public float reloadCD = 1;
 
+    [Header("State")]
     // Homemade statemachine
     public bool isAlive;
     public bool isChasing;
     public bool isShooting;
 
+
+    public float reloadTime;
+
+    [Header ("References")]
     public NavMeshAgent enemyNavigator;
     public GameObject enemyTarget = null;
     [SerializeField] GameObject defensePoint = null;
+    private EnemySpawner enemySpawner;
+    private GameObject lastShooter;
 
     public override void OnStartServer()
     {
         base.OnStartServer();
+        enemySpawner = GameObject.FindObjectOfType<EnemySpawner>();
         enemyNavigator = gameObject.GetComponent<NavMeshAgent>();
+        defensePoint = GameObject.FindGameObjectWithTag("defensePoint");
         isAlive = true;
         AsssignTarget();
     }
 
-    private void Update ()
+    private void FixedUpdate ()
     {
+        if (!isAlive) {return;}
         MoveToTarget();
+        reloadCD -= Time.deltaTime;
     }
 
     [Server]
     public void AsssignTarget ()
     {
-        // it will always find 1 palyer in hierarchy, that's a bug but have to keep it for now
+        // it will always find 1 player in hierarchy, good enough if there is only one connected player
         enemyTarget = GameObject.FindGameObjectWithTag("Player");
-//        if ( enemyTarget != player)
-//        { enemyTarget = defensePoint}
+
+        // looking for workaround to follow player that is closer
+        if (NetworkServer.connections.Count > 1)
+        {
+            foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                float distance = Vector3.Distance(this.transform.position, player.transform.position);
+            }
+        }
+        
+        // Players are dead, waiting for respawn, or too far away, also.. can be swapped to additonal trigger collider for checking again
+ //       if (enemyTarget = null) { enemyTarget = defensePoint;}
     }    
     
     [Server]
     public void MoveToTarget ()
     {
+        if (!isAlive) { enemyNavigator.ResetPath();}
         // using navmesh for basic enemy movement, with changing enemyTarget it can be used for chasing/patrolling/following 
         if (enemyNavigator.destination == null) {return;}
-        enemyNavigator.SetDestination(enemyTarget.transform.position);
-        isChasing = true;
 
-        float distance = Vector3.Distance(this.transform.position,enemyTarget.transform.position);
-        // with setting up navmesh agent let enemy start shooting his target
-        if (distance < 10)
-        {
-             isChasing = false;
-             startShooting();
+        float distance = Vector3.Distance(this.transform.position,enemyTarget.transform.position);  
+        
+        if (distance >12)
+        {    
+            isChasing = true;      
+            enemyNavigator.SetDestination(enemyTarget.transform.position);
         }
+
+        // with setting up navmesh agent let enemy start shooting his target
+        if (4 < distance && distance < 12)
+        {
+            isChasing = false;
+            startShooting();
+        }
+
+
 
     }
 
@@ -61,7 +94,37 @@ public class Enemy : NetworkBehaviour
     public void startShooting ()
     {
         isShooting = true;
-        // CmdShoot() using bullet prefab
+        StartCoroutine(Shooting());
+    }
+
+    [Server]
+    public IEnumerator Shooting ()
+    {
+        float distance = Vector3.Distance(this.transform.position,enemyTarget.transform.position);
+        while (distance < 12 && distance > 4)
+        {
+
+            // Wait for the reload
+            yield return new WaitForSeconds(reloadCD);
+            if (reloadCD < 0)
+            {
+                EnemyFire();
+                reloadCD = reloadTime ;
+            }
+        }
+        isShooting = false;
+    }
+
+    [Server]
+    public void EnemyFire()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
+
+        // Apply force to bullet in the direction the player is facing
+        bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bullet.GetComponent<Bullet>().bulletSpeed);
+        bullet.GetComponent<Bullet>().shooter = this.gameObject;
+        // Spawn bullet on clients
+        NetworkServer.Spawn(bullet);
     }
 
     [Server]
@@ -74,12 +137,26 @@ public class Enemy : NetworkBehaviour
     [Server]
     public void EnemyDie ()
     {
-        if (enemyHealth <= 0)
-        // last hit for scoring point
-
-        // player.GetComponent<PlayerScore>().score += 1;
+        if (enemyHealth <= 0) {
+        isAlive = false;
+        // last hit for scoring point, not giving score if shot by another enemy 
+        if (lastShooter.GetComponent<PlayerScore>() != null) { lastShooter.GetComponent<PlayerScore>().score +=1; } 
         NetworkServer.Destroy(gameObject);
-        //  NetworkServer.Spawn(deadbody); -- let people see some bloody massacre 
+        //  NetworkServer.Spawn(deadbody); -- let people see some bloody massacre, eed some additional models/animations/else
+        }
+    }
+
+        private void OnTriggerEnter(Collider other)
+    {
+        //Check if get hit by bullet
+        if (other.GetComponent<Bullet>() != null)
+        {
+            Bullet bullet = other.GetComponent<Bullet>();
+            if (bullet.canDamageEnemy)
+            // Apply damage to enemy 
+            TakeDamage(bullet.damageAmount);
+            lastShooter = bullet.shooter;
+        }
     }
 
 }

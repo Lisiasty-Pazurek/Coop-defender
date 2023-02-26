@@ -9,22 +9,20 @@ public class GameSession : NetworkBehaviour
 {
     [Header("Game Settings")]
     public float gameDuration = 180f;
-    public float countdownDuration = 3f;
+    [SerializeField] public float countdownDuration = 3f;
 
     [Header("UI Elements")]
     public Text countdownText;
     public Text gametimeText;
-    public Text scoreText;
-
-    [Header("Prefabs")]
-    // public GameObject playerPrefab;
-
-    [SyncVar(hook = nameof(OnScoreChanged))]
-    private int score;
-
-    private float countdownTimer;
+    [SyncVar] private float countdownTimer;
     private float gameTimer;
-    private bool gameEnded;
+    public bool gameEnded;
+
+    public Canvas postGameWindow;
+
+    [Header("References")]
+    public PlayerMovementController playerController;
+
 
     public override void OnStartServer()
     {
@@ -37,6 +35,12 @@ public class GameSession : NetworkBehaviour
         countdownTimer = countdownDuration;
         gameTimer = gameDuration;
         gameEnded = false;
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+        
     }
 
     [ServerCallback]
@@ -57,7 +61,7 @@ public class GameSession : NetworkBehaviour
             if (countdownTimer <= 0f)
             {
                 RpcDisableCountdown();
-//                RpcEnablePlayerController();
+                RpcEnablePlayerController();
             }
         }
         else
@@ -75,13 +79,14 @@ public class GameSession : NetworkBehaviour
     [ClientRpc]
     private void RpcUpdateCountdown(int secondsLeft)
     {
-        countdownText.text = "Game starting in " + secondsLeft + " seconds...";
+        countdownText.text = secondsLeft.ToString();
+        Debug.Log(" countdown" + secondsLeft);
     }
 
     [ClientRpc]
     private void RpcUpdateGameTimer(int secondsLeft)
     {
-        gametimeText.text =  secondsLeft + " seconds";
+        gametimeText.text =  secondsLeft.ToString() ;
     }
 
     [ClientRpc]
@@ -90,24 +95,32 @@ public class GameSession : NetworkBehaviour
         countdownText.gameObject.SetActive(false);
     }
 
-    // [Command]
-    // public void CmdAddScore(int points)
-    // {
-    //     score += points;
-    // }
-
-    private void OnScoreChanged(int oldScore, int newScore)
+    [ClientRpc]
+    public void RpcEnablePlayerController()
     {
-        scoreText.text = "Score: " + newScore;
+        playerController.isReady = true;
     }
 
+    [Server]
     private void EndGame()
     {
         gameEnded = true;
 
         Debug.Log("Game ended");
         // Display scoreboard
-        // ...
+        // RpcClient
+
+        foreach (PlayerMovementController player in FindObjectsOfType<PlayerMovementController>())
+        {
+            player.isReady = false;
+        }
+
+        foreach (Enemy enemy in FindObjectsOfType<Enemy>())
+        {
+            enemy.isAlive = false;
+        }
+
+        postGameWindow.enabled = true;
     }
 
     public override void OnStartClient()

@@ -5,10 +5,13 @@ using Mirror;
 
 public class Bullet : NetworkBehaviour
 {
+    [SerializeField] private float bulletLifetime = 2f;    
     [SerializeField] public float bulletSpeed = 100f;
-    [SerializeField] private float bulletLifetime = 3f;
-    [SerializeField] private int damageAmount = 1;
-    [SerializeField] private bool canDamagePlayer = false;
+    [SerializeField] public int damageAmount = 1;
+    [SerializeField] public bool canDamagePlayer = false;
+    [SerializeField] public bool canDamageEnemy = true;
+
+    public GameObject shooter;        // Bullet ownership reference for scoring a point and any other usual stuff
 
     private float bulletTimer = 0f;
 
@@ -18,7 +21,6 @@ public class Bullet : NetworkBehaviour
         // Set bullet timer to zero when bullet is spawned
         bulletTimer = 0f;
 
-        // Bullet ownership reference for scoring a point and any other usual stuff
     }
 
     private void FixedUpdate()
@@ -34,22 +36,9 @@ public class Bullet : NetworkBehaviour
     }
 
     [ServerCallback]
-    private void OnTriggerEnter(Collider other)
+    private void OnColliderEnter(Collider other)
     {
-        // Check if bullet collided with a player
-        PlayerController player = other.gameObject.GetComponent<PlayerController>();
-        if (canDamagePlayer && player != null)
-        {
-            // Apply damage to the player 
-            player.TakeDamage(damageAmount);
-        }
-        Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy != null)
-        {
-            // Apply damage to the enemy 
-             enemy.TakeDamage(damageAmount);
-        }
-
+        // Destroy if hit something that's in way
         NetworkServer.Destroy(gameObject);
     }
 }

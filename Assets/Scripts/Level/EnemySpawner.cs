@@ -2,14 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System.Linq;
 
 public class EnemySpawner : NetworkBehaviour
 {
     [SerializeField] public GameObject enemyPrefab;
     [SerializeField] public float spawnInterval;
     [SerializeField] public int  maxEnemies = 10;
-    private int numEnemies = 0;
+    [SerializeField] [SyncVar]public int numEnemies = 0;
     [SerializeField] List<Transform> enemySpawnPoints;
+
+    public GameSession session;
 
 
 
@@ -17,23 +20,35 @@ public class EnemySpawner : NetworkBehaviour
     public override void OnStartServer()
     {
         StartCoroutine(SpawnEnemyCoroutine());
+        session = FindObjectOfType<GameSession>();
     }
 
+    private void Update ()
+    {
+      
+        numEnemies = GameObject.FindObjectsOfType<Enemy>().Count();
+    }
+
+    // Coroutine ends after spawning 10th enemy so need to be restarted once 10th enemy dies
     private IEnumerator SpawnEnemyCoroutine()
     {
+        
         while (numEnemies < maxEnemies)
         {
+
             // Wait for the spawn interval
             yield return new WaitForSeconds(spawnInterval);
 
             // Spawn an enemy if we haven't reached the max yet
             if (numEnemies < maxEnemies)
-            {
+            {   
+                if (session.gameEnded) {yield break;}
                 GameObject enemy = Instantiate(enemyPrefab,enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count)]);
                 NetworkServer.Spawn(enemy);
-                numEnemies++;
             }
+       
         }
+
     }
 }
 
