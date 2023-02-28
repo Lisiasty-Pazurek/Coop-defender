@@ -22,6 +22,7 @@ public class GameSession : NetworkBehaviour
 
     [Header("References")]
     public PlayerMovementController playerController;
+    public UIHandler uiHandler;
 
 
     public override void OnStartServer()
@@ -29,7 +30,7 @@ public class GameSession : NetworkBehaviour
         base.OnStartServer();
 
         // Spawn player prefabs for each connected client
-        NetworkServer.SpawnObjects();
+//        NetworkServer.SpawnObjects();
 
         // Start the countdown
         countdownTimer = countdownDuration;
@@ -40,6 +41,8 @@ public class GameSession : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
+        NetworkClient.Ready();
+        uiHandler = FindObjectOfType<UIHandler>();
         
     }
 
@@ -99,6 +102,7 @@ public class GameSession : NetworkBehaviour
     public void RpcEnablePlayerController()
     {
         playerController.isReady = true;
+        
     }
 
     [Server]
@@ -108,7 +112,7 @@ public class GameSession : NetworkBehaviour
 
         Debug.Log("Game ended");
         // Display scoreboard
-        // RpcClient
+        
 
         foreach (PlayerMovementController player in FindObjectsOfType<PlayerMovementController>())
         {
@@ -120,6 +124,13 @@ public class GameSession : NetworkBehaviour
             enemy.isAlive = false;
         }
 
+        RpcEndgame ();
+
+    }
+
+    [ClientRpc]
+    public void RpcEndgame ()
+    {
         postGameWindow.enabled = true;
     }
 

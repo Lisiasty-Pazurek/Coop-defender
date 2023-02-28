@@ -213,7 +213,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 945784786697987653, guid: 7455f6066933281469d28ff832f452bf, type: 3}
   bulletSpawnPoint: {fileID: 5154872357061691754}
   uiHandler: {fileID: 0}
-  pcAnimator: {fileID: 0}
+  pcAnimator: {fileID: 5863474957185472346}
   isReady: 0
 --- !u!54 &3161827005819108190
 Rigidbody:
@@ -294,6 +294,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a72119b3597de044ea6d34141ea5708b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
 --- !u!114 &-2385147783297686865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,7 +312,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
-  clientAuthority: 0
+  clientAuthority: 1
   animator: {fileID: 5863474957185472346}
 --- !u!136 &6223180428799467715
 CapsuleCollider:
@@ -434,7 +437,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 95474626191974340, guid: 15a550206f811c346b37f3a3f4495178, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 95474626191974340, guid: 15a550206f811c346b37f3a3f4495178, type: 3}
       propertyPath: m_Controller
@@ -477,7 +480,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5769037142990595714}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30b43ea742fe98141a66a59c3eca2700, type: 3}
   m_Name: 

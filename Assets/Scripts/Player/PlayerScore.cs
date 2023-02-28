@@ -9,12 +9,12 @@ public class PlayerScore : NetworkBehaviour
     [SyncVar (hook = nameof(ScoreChange))] public int score;
     public UIHandler uiHandler;
 
-    public void Start()
+    public override void OnStartLocalPlayer()
     {
-        
         uiHandler = this.GetComponentInParent<PlayerMovementController>().uiHandler;
     }
 
+    [TargetRpc]
     public void ScoreChange(int oldValue, int newValue)
     {
         score = newValue;

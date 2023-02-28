@@ -7,7 +7,7 @@ using Mirror;
 public class PlayerMovementController : NetworkBehaviour
 {   
     [Header ("Settings")]
-    [SerializeField] [SyncVar] public int playerHealth = 5;
+    [SerializeField] [SyncVar (hook = nameof(ChangeHealth))] public int playerHealth = 5;
     [SerializeField] private float movementSpeed = 5f;
     [SerializeField] private float rotationSpeed = 6f;
     [SerializeField] private float reloadTime = .2f;
@@ -24,7 +24,7 @@ public class PlayerMovementController : NetworkBehaviour
     public Animator pcAnimator;
 
     private float reloadCD;
-    public bool isReady = false;
+    [SyncVar]public bool isReady = false;
     private bool isGrounded; //something is bugged
 
     public override void OnStartLocalPlayer()
@@ -34,24 +34,26 @@ public class PlayerMovementController : NetworkBehaviour
         // Get reference to main camera and set it to follow the player
         cam = Camera.main;
         FindObjectOfType<GameSession>().playerController = this;
-        pcAnimator =GetComponent<Animator>();
-
+        pcAnimator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
+        uiHandler = GameObject.FindObjectOfType<UIHandler>();
         // Disable cursor and hide it - not necessary, can be useful for nice looking one 
         // Cursor.lockState = CursorLockMode.Locked;
         // Cursor.visible = false;
     }
 
-    private void Start()
+    public override void OnStartServer()
     {
         //Get some basic references for rb and ui handler
         rb = GetComponent<Rigidbody>();
-        uiHandler = GameObject.FindObjectOfType<UIHandler>();
+
     }
 
     private void Update() 
     {
+        if (!isLocalPlayer  || !isReady) {return;}
         // Check for shooting input
-        if (Input.GetButtonDown("Fire1") && isReady)
+        if (Input.GetButtonDown("Fire1") )
         {
             CmdFire();
         }
@@ -74,9 +76,10 @@ public class PlayerMovementController : NetworkBehaviour
 
         //cheesy workaround for animation, looks good aaand need lot more work
         pcAnimator.SetFloat("Speed", Vector3.Dot(gameObject.transform.forward, movement));
+        pcAnimator.SetFloat("Direction", Vector3.Dot(gameObject.transform.right, movement));
 
         // Apply movement to rigidbody, looks bad works good
-//        rb.MovePosition(transform.position + movement * Time.deltaTime);
+        rb.MovePosition(transform.position + movement * Time.deltaTime);
 
         // Cast a ray from the camera to the mouse position
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
@@ -140,8 +143,7 @@ public class PlayerMovementController : NetworkBehaviour
     void TakeDamage(int amount)
     {
         if (!isReady) {return;}
-        playerHealth -= amount;
-        uiHandler.ChangeHealth(playerHealth.ToString());
+        ChangeHealth(playerHealth, playerHealth -= amount);
         if (playerHealth <= 0)
         {   
             StartCoroutine(PlayerWounded());
@@ -162,9 +164,17 @@ public class PlayerMovementController : NetworkBehaviour
             isReady = true;
         }
 
-        playerHealth = 5;
-        uiHandler.ChangeHealth(playerHealth.ToString());
+        ChangeHealth(playerHealth, 5);
         
+        
+    }
+
+
+    public void ChangeHealth(int oldValue, int newValue)
+    {
+        playerHealth = newValue;
+        if (!isLocalPlayer) {return;}
+        uiHandler.ChangeHealth(playerHealth.ToString());
     }
 
     

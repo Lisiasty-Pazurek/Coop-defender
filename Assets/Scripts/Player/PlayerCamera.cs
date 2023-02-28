@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using Cinemachine;
+using Mirror;
 
 // This sets up the scene cinemachine camera to borrow lobby menu camera and follow player gameobject
 
-    public class PlayerCamera : MonoBehaviour
+    public class PlayerCamera : NetworkBehaviour
     {
         private Camera mainCam;
         private CinemachineVirtualCamera cineCam;
 
-        public void Start ()
+        public override void OnStartLocalPlayer ()
         {
             SetupPlayerCamera();
         }

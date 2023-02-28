@@ -67,7 +67,7 @@ public class Enemy : NetworkBehaviour
     [Server]
     public void MoveToTarget ()
     {
-        if (!isAlive) { enemyNavigator.ResetPath();}
+        if (!isAlive) { enemyNavigator.ResetPath(); }
         // using navmesh for basic enemy movement, with changing enemyTarget it can be used for chasing/patrolling/following 
         if (enemyNavigator.destination == null) {return;}
 
@@ -126,6 +126,19 @@ public class Enemy : NetworkBehaviour
         // Spawn bullet on clients
         NetworkServer.Spawn(bullet);
     }
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        //Check if get hit by bullet
+        if (other.GetComponent<Bullet>() != null)
+        {
+            Bullet bullet = other.GetComponent<Bullet>();
+            if (bullet.canDamageEnemy)
+            // Apply damage to enemy 
+            TakeDamage(bullet.damageAmount);
+            lastShooter = bullet.shooter;
+        }
+    }
 
     [Server]
     public void TakeDamage(int amount)
@@ -140,23 +153,14 @@ public class Enemy : NetworkBehaviour
         if (enemyHealth <= 0) {
         isAlive = false;
         // last hit for scoring point, not giving score if shot by another enemy 
-        if (lastShooter.GetComponent<PlayerScore>() != null) { lastShooter.GetComponent<PlayerScore>().score +=1; } 
+        if (lastShooter.GetComponent<PlayerScore>() != null) { lastShooter.GetComponent<PlayerScore>().score +=1;} 
         NetworkServer.Destroy(gameObject);
-        //  NetworkServer.Spawn(deadbody); -- let people see some bloody massacre, eed some additional models/animations/else
+        //  NetworkServer.Spawn(deadbody); -- let people see some "positive feedback"", need some additional models/animations/else
         }
     }
 
-        private void OnTriggerEnter(Collider other)
-    {
-        //Check if get hit by bullet
-        if (other.GetComponent<Bullet>() != null)
-        {
-            Bullet bullet = other.GetComponent<Bullet>();
-            if (bullet.canDamageEnemy)
-            // Apply damage to enemy 
-            TakeDamage(bullet.damageAmount);
-            lastShooter = bullet.shooter;
-        }
-    }
+
+
+    
 
 }
