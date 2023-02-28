@@ -23,9 +23,15 @@ public class PlayerMovementController : NetworkBehaviour
 //    public GameSession gameSession;
     public Animator pcAnimator;
 
+    [Header("Attributes")]
+    [SyncVar]public bool isAlive = false;    
     private float reloadCD;
-    [SyncVar]public bool isAlive = false;
     private bool isGrounded; //something is bugged
+
+    [Header("Debugging")]
+    [Tooltip("plz readonly values")]
+    public Vector3 movement;
+    public Vector3 rotation;
 
     public override void OnStartLocalPlayer()
     {
@@ -33,7 +39,7 @@ public class PlayerMovementController : NetworkBehaviour
         // Get reference to main camera and set it to follow the player
         cam = Camera.main;
         FindObjectOfType<GameSession>().playerController = this;
-        pcAnimator = GetComponent<Animator>();
+        pcAnimator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
         uiHandler = GameObject.FindObjectOfType<UIHandler>();
         // Disable cursor and hide it - not necessary, can be useful for nice looking one 
@@ -46,36 +52,28 @@ public class PlayerMovementController : NetworkBehaviour
         base.OnStartServer();
         //Get some basic references for rb and ui handler
         rb = GetComponent<Rigidbody>();
+        pcAnimator = GetComponentInChildren<Animator>();
 
     }
 
     private void Update() 
-    {
-        if (!isLocalPlayer  || !isAlive) {return;}
-        // Check for shooting input
-        if (Input.GetButtonDown("Fire1") )
-        {
-            CmdFire();
-        }
+    {        if (!isAlive || !isLocalPlayer)  { return;}
 
-        reloadCD -= Time.deltaTime;
-    }
+            RotateTowardsCursor();
 
-    private void FixedUpdate()
-    {
-        if (!isLocalPlayer || !isAlive)  { return;}
-        RotateTowardsCursor();
+            // Get input from horizontal and vertical axes
+            float moveHorizontal = Input.GetAxis("Horizontal");
+            float moveVertical = Input.GetAxis("Vertical");
 
-        // Get input from horizontal and vertical axes
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+            // Calculate movement vector based on input and movement speed 
+            movement = new Vector3(moveHorizontal, 0f, moveVertical) * movementSpeed;
+            // make it relative to camera rotation
+            movement = cam.transform.TransformDirection(movement);
 
-        // Calculate movement vector based on input and movement speed 
-        Vector3 movement = new Vector3(moveHorizontal , 0f, moveVertical ) * movementSpeed;
-        // make it relative to camera rotation
-        movement = cam.transform.TransformDirection(movement);
 
-        //cheesy workaround for animation, looks good aaand need lot more work
+
+        //cheesy workaround for animation, looks better but need lot more work
+        // Vector3.Dot is nice to get input on axis relative to pointer and character rotation
         pcAnimator.SetFloat("Speed", Vector3.Dot(gameObject.transform.forward, movement));
         pcAnimator.SetFloat("Direction", Vector3.Dot(gameObject.transform.right, movement));
 
@@ -85,7 +83,15 @@ public class PlayerMovementController : NetworkBehaviour
         // Check if player is on the ground
         isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
 
+        // Check for shooting input
+        if (Input.GetButtonDown("Fire1") )
+        {
+            CmdFire();
+        }
+
+        reloadCD -= Time.deltaTime;
     }
+
 
     [Client]
     void RotateTowardsCursor()
@@ -99,7 +105,7 @@ public class PlayerMovementController : NetworkBehaviour
         if (Physics.Raycast(ray, out hit, 100f, 7))
         {
             // Get the direction to the hit point
-            Vector3 rotation = hit.point - transform.position;
+            rotation = hit.point - transform.position;
             // Ignore the y axis to avoid tilting the character
             rotation.y = 0;
 
