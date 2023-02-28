@@ -29,8 +29,8 @@ using UnityEngine.UI;
         /// <param name="sceneName">Name of the new scene.</param>
         public override void OnRoomServerSceneChanged(string sceneName)
         {
-            // spawn the initial batch of Rewards
-            if (sceneName == GameplayScene){}
+
+
             
         }
 

@@ -24,13 +24,12 @@ public class PlayerMovementController : NetworkBehaviour
     public Animator pcAnimator;
 
     private float reloadCD;
-    [SyncVar]public bool isReady = false;
+    [SyncVar]public bool isAlive = false;
     private bool isGrounded; //something is bugged
 
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-
         // Get reference to main camera and set it to follow the player
         cam = Camera.main;
         FindObjectOfType<GameSession>().playerController = this;
@@ -44,6 +43,7 @@ public class PlayerMovementController : NetworkBehaviour
 
     public override void OnStartServer()
     {
+        base.OnStartServer();
         //Get some basic references for rb and ui handler
         rb = GetComponent<Rigidbody>();
 
@@ -51,7 +51,7 @@ public class PlayerMovementController : NetworkBehaviour
 
     private void Update() 
     {
-        if (!isLocalPlayer  || !isReady) {return;}
+        if (!isLocalPlayer  || !isAlive) {return;}
         // Check for shooting input
         if (Input.GetButtonDown("Fire1") )
         {
@@ -63,7 +63,8 @@ public class PlayerMovementController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!isLocalPlayer || !isReady)  { return;}
+        if (!isLocalPlayer || !isAlive)  { return;}
+        RotateTowardsCursor();
 
         // Get input from horizontal and vertical axes
         float moveHorizontal = Input.GetAxis("Horizontal");
@@ -81,13 +82,19 @@ public class PlayerMovementController : NetworkBehaviour
         // Apply movement to rigidbody, looks bad works good
         rb.MovePosition(transform.position + movement * Time.deltaTime);
 
+        // Check if player is on the ground
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
+
+    }
+
+    [Client]
+    void RotateTowardsCursor()
+    {
         // Cast a ray from the camera to the mouse position
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
         // Declare a RaycastHit variable to store information about the hit
         RaycastHit hit;
-
-
 
         if (Physics.Raycast(ray, out hit, 100f, 7))
         {
@@ -100,13 +107,10 @@ public class PlayerMovementController : NetworkBehaviour
 
             // Apply rotation to player
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.deltaTime));
-
         }
 
-        // Check if player is on the ground
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
-
     }
+
 
     [Command]
     public void CmdFire()
@@ -142,7 +146,7 @@ public class PlayerMovementController : NetworkBehaviour
     [Server]
     void TakeDamage(int amount)
     {
-        if (!isReady) {return;}
+        if (!isAlive) {return;}
         ChangeHealth(playerHealth, playerHealth -= amount);
         if (playerHealth <= 0)
         {   
@@ -154,14 +158,14 @@ public class PlayerMovementController : NetworkBehaviour
     [Server]
     public IEnumerator PlayerWounded()
     {
-        isReady = false;
+        isAlive = false;
 
         // need some visual feedback with animator but works as intended
-        while (isReady == false)
+        while (isAlive == false)
         {
             yield return new WaitForSeconds(6f); 
             
-            isReady = true;
+            isAlive = true;
         }
 
         ChangeHealth(playerHealth, 5);
@@ -169,7 +173,7 @@ public class PlayerMovementController : NetworkBehaviour
         
     }
 
-
+    [Server]
     public void ChangeHealth(int oldValue, int newValue)
     {
         playerHealth = newValue;

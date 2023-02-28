@@ -14,13 +14,19 @@ public class PlayerScore : NetworkBehaviour
         uiHandler = this.GetComponentInParent<PlayerMovementController>().uiHandler;
     }
 
-    [TargetRpc]
+    [Server]
     public void ScoreChange(int oldValue, int newValue)
     {
         score = newValue;
+        if (!isLocalPlayer) {return;}
+        ChangeUIScore();
+    }
+    
+
+    void ChangeUIScore()
+    {
         uiHandler.ChangeScore(score.ToString());
     }
-
 
 }
 

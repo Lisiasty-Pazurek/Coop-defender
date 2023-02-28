@@ -30,7 +30,7 @@ public class GameSession : NetworkBehaviour
         base.OnStartServer();
 
         // Spawn player prefabs for each connected client
-//        NetworkServer.SpawnObjects();
+//        NetworkServer.SpawnObjects(); // works without it, no need for overriding it
 
         // Start the countdown
         countdownTimer = countdownDuration;
@@ -41,7 +41,6 @@ public class GameSession : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-        NetworkClient.Ready();
         uiHandler = FindObjectOfType<UIHandler>();
         
     }
@@ -49,7 +48,7 @@ public class GameSession : NetworkBehaviour
     [ServerCallback]
     private void Update()
     {
-        if (gameEnded) return;
+        if (gameEnded) {return;}
 
         // Countdown before game starts
         if (countdownTimer > 0f)
@@ -83,7 +82,7 @@ public class GameSession : NetworkBehaviour
     private void RpcUpdateCountdown(int secondsLeft)
     {
         countdownText.text = secondsLeft.ToString();
-        Debug.Log(" countdown" + secondsLeft);
+        Debug.Log(secondsLeft);
     }
 
     [ClientRpc]
@@ -101,7 +100,7 @@ public class GameSession : NetworkBehaviour
     [ClientRpc]
     public void RpcEnablePlayerController()
     {
-        playerController.isReady = true;
+        playerController.isAlive = true;
         
     }
 
@@ -113,10 +112,9 @@ public class GameSession : NetworkBehaviour
         Debug.Log("Game ended");
         // Display scoreboard
         
-
         foreach (PlayerMovementController player in FindObjectsOfType<PlayerMovementController>())
         {
-            player.isReady = false;
+            player.isAlive = false;
         }
 
         foreach (Enemy enemy in FindObjectsOfType<Enemy>())
@@ -132,6 +130,7 @@ public class GameSession : NetworkBehaviour
     public void RpcEndgame ()
     {
         postGameWindow.enabled = true;
+        //need to add scoreboard here once connectivity issues will be fixed
     }
 
     public override void OnStartClient()

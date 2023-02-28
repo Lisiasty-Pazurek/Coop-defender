@@ -308,7 +308,7 @@ MonoBehaviour:
   MaximizeSocketBuffers: 1
   ReliableMaxMessageSize: 298449
   UnreliableMaxMessageSize: 1199
-  debugLog: 0
+  debugLog: 1
   statisticsGUI: 0
   statisticsLog: 0
 --- !u!4 &2008127832
@@ -348,7 +348,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2008127829}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0110f245bfcfc7d459681f7bd9ebc590, type: 3}
   m_Name: 
@@ -382,12 +382,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 1
   runInBackground: 1
-  autoStartServerBuild: 1
+  autoStartServerBuild: 0
   autoConnectClientBuild: 0
   sendRate: 30
   offlineScene: Assets/Scenes/OfflineScene.unity
   onlineScene: Assets/Scenes/RoomScene.unity
-  transport: {fileID: 2008127830}
+  transport: {fileID: 2008127834}
   networkAddress: localhost
   maxConnections: 5
   authenticator: {fileID: 0}

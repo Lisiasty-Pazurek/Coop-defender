@@ -19,16 +19,17 @@ public class EnemySpawner : NetworkBehaviour
     // Start spawning enemies when the game starts
     public override void OnStartServer()
     {
+        base.OnStartServer();
         StartCoroutine(SpawnEnemyCoroutine());
         session = FindObjectOfType<GameSession>();
     }
 
     private void Update ()
     {
-      
         numEnemies = GameObject.FindObjectsOfType<Enemy>().Count();
     }
 
+    [Server]
     // Coroutine ends after spawning 10th enemy so need to be restarted once 10th enemy dies
     private IEnumerator SpawnEnemyCoroutine()
     {

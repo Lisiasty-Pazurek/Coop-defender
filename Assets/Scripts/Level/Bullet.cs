@@ -8,6 +8,8 @@ public class Bullet : NetworkBehaviour
     [SerializeField] private float bulletLifetime = 2f;    
     [SerializeField] public float bulletSpeed = 100f;
     [SerializeField] public int damageAmount = 1;
+
+    // It can be useful for some friendly fire grenades etc.
     [SerializeField] public bool canDamagePlayer = false;
     [SerializeField] public bool canDamageEnemy = true;
 

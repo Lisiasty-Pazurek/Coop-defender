@@ -38,7 +38,13 @@ public class Enemy : NetworkBehaviour
         AsssignTarget();
     }
 
-    private void FixedUpdate ()
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+    }
+
+
+    private void Update ()
     {
         if (!isAlive) {return;}
         MoveToTarget();
@@ -64,14 +70,14 @@ public class Enemy : NetworkBehaviour
  //       if (enemyTarget = null) { enemyTarget = defensePoint;}
     }    
     
-    [Server]
+    [ServerCallback]
     public void MoveToTarget ()
     {
         if (!isAlive) { enemyNavigator.ResetPath(); }
         // using navmesh for basic enemy movement, with changing enemyTarget it can be used for chasing/patrolling/following 
         if (enemyNavigator.destination == null) {return;}
 
-        float distance = Vector3.Distance(this.transform.position,enemyTarget.transform.position);  
+        float distance = Vector3.Distance(this.transform.position, enemyTarget.transform.position);  
         
         if (distance >12)
         {    
@@ -126,7 +132,7 @@ public class Enemy : NetworkBehaviour
         // Spawn bullet on clients
         NetworkServer.Spawn(bullet);
     }
-    
+
     private void OnTriggerEnter(Collider other)
     {
         //Check if get hit by bullet

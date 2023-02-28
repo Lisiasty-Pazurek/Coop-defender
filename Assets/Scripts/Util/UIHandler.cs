@@ -19,6 +19,8 @@ public class UIHandler : MonoBehaviour
         scoreText.text = amount;
     }
 
+    
+
     public void RestartLevel ()
     {
         FindObjectOfType<NetworkRoomManagerExt>().ServerChangeScene(FindObjectOfType<NetworkRoomManagerExt>().RoomScene);
