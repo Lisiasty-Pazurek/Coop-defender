@@ -125,12 +125,13 @@ public class PlayerMovementController : NetworkBehaviour
         bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bullet.GetComponent<Bullet>().bulletSpeed);
         bullet.GetComponent<Bullet>().shooter = this.gameObject;
         // Spawn bullet on clients
-        NetworkServer.Spawn(bullet);
+//        NetworkServer.Spawn(bullet);
         reloadCD = reloadTime;
         }
 
     }
 
+    [ServerCallback]
     private void OnTriggerEnter(Collider other)
     {
         //Check if get hit by bullet
@@ -147,7 +148,7 @@ public class PlayerMovementController : NetworkBehaviour
     void TakeDamage(int amount)
     {
         if (!isAlive) {return;}
-        ChangeHealth(playerHealth, playerHealth -= amount);
+        playerHealth -= amount;
         if (playerHealth <= 0)
         {   
             StartCoroutine(PlayerWounded());
@@ -168,15 +169,15 @@ public class PlayerMovementController : NetworkBehaviour
             isAlive = true;
         }
 
-        ChangeHealth(playerHealth, 5);
+        playerHealth = 5;
         
         
     }
 
-    [Server]
+
+    [ServerCallback]
     public void ChangeHealth(int oldValue, int newValue)
     {
-        playerHealth = newValue;
         if (!isLocalPlayer) {return;}
         uiHandler.ChangeHealth(playerHealth.ToString());
     }

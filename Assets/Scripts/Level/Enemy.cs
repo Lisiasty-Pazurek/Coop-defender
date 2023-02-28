@@ -43,7 +43,7 @@ public class Enemy : NetworkBehaviour
         base.OnStartClient();
     }
 
-
+    [ServerCallback]
     private void Update ()
     {
         if (!isAlive) {return;}
@@ -130,9 +130,10 @@ public class Enemy : NetworkBehaviour
         bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bullet.GetComponent<Bullet>().bulletSpeed);
         bullet.GetComponent<Bullet>().shooter = this.gameObject;
         // Spawn bullet on clients
-        NetworkServer.Spawn(bullet);
+//        NetworkServer.Spawn(bullet);
     }
 
+    [ServerCallback]
     private void OnTriggerEnter(Collider other)
     {
         //Check if get hit by bullet
