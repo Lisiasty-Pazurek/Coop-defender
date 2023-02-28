@@ -125,12 +125,14 @@ public class Enemy : NetworkBehaviour
     public void EnemyFire()
     {
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
-
+        // !!!! Spawn bullet on clients - BEFORE APPLYING FORCE     
+        NetworkServer.Spawn(bullet);
         // Apply force to bullet in the direction the player is facing
-        bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bullet.GetComponent<Bullet>().bulletSpeed);
         bullet.GetComponent<Bullet>().shooter = this.gameObject;
+        bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bullet.GetComponent<Bullet>().bulletSpeed);
+
         // Spawn bullet on clients
-//        NetworkServer.Spawn(bullet);
+
     }
 
     [ServerCallback]

@@ -33,7 +33,7 @@ public class Bullet : NetworkBehaviour
         // Destroy bullet after a certain amount of time
         if (bulletTimer >= bulletLifetime)
         {
-            NetworkServer.Destroy(gameObject);
+            Destroy(gameObject);
         }
     }
 

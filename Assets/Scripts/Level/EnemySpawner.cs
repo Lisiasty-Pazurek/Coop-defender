@@ -44,8 +44,9 @@ public class EnemySpawner : NetworkBehaviour
             if (numEnemies < maxEnemies)
             {   
                 if (session.gameEnded) {yield break;}
-                GameObject enemy = Instantiate(enemyPrefab,enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count)]);
+                GameObject enemy = Instantiate(enemyPrefab);
                 NetworkServer.Spawn(enemy);
+                enemy.transform.position = enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count)].position;
             }
        
         }
