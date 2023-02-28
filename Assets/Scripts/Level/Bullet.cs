@@ -13,7 +13,7 @@ public class Bullet : NetworkBehaviour
     [SerializeField] public bool canDamagePlayer = false;
     [SerializeField] public bool canDamageEnemy = true;
 
-    public GameObject shooter;        // Bullet ownership reference for scoring a point and any other usual stuff
+    [SyncVar] public GameObject shooter;        // Bullet ownership reference for scoring a point and any other usual stuff
 
     private float bulletTimer = 0f;
 

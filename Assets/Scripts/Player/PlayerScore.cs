@@ -14,7 +14,7 @@ public class PlayerScore : NetworkBehaviour
         uiHandler = this.GetComponentInParent<PlayerMovementController>().uiHandler;
     }
 
-    [ServerCallback]
+[Server]
     public void ScoreChange(int oldValue, int newValue)
     {
         if (!isLocalPlayer) {return;}

@@ -333,7 +333,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2008127829}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 929e3234c7db540b899f00183fc2b1fe, type: 3}
   m_Name: 
@@ -348,7 +348,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2008127829}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0110f245bfcfc7d459681f7bd9ebc590, type: 3}
   m_Name: 
@@ -387,13 +387,13 @@ MonoBehaviour:
   sendRate: 30
   offlineScene: Assets/Scenes/OfflineScene.unity
   onlineScene: Assets/Scenes/RoomScene.unity
-  transport: {fileID: 2008127830}
+  transport: {fileID: 2008127834}
   networkAddress: localhost
   maxConnections: 5
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 6239893102336994761, guid: 7bb4561e8ecc2014f92ce10753c54cc9, type: 3}
   autoCreatePlayer: 1
-  playerSpawnMethod: 1
+  playerSpawnMethod: 0
   spawnPrefabs:
   - {fileID: 2928675826010894138, guid: 4d3d5c5a290feb54b803e566234f53e8, type: 3}
   - {fileID: 945784786697987653, guid: 7455f6066933281469d28ff832f452bf, type: 3}
@@ -404,7 +404,7 @@ MonoBehaviour:
   roomPlayerPrefab: {fileID: -8189325220886818520, guid: fc9b3e7019c73f54fa008d7b0e1ca955, type: 3}
   RoomScene: Assets/Scenes/RoomScene.unity
   GameplayScene: Assets/Scenes/OnlineScene.unity
-  _allPlayersReady: 1
+  _allPlayersReady: 0
   roomSlots: []
   clientIndex: 0
 --- !u!114 &2008127839

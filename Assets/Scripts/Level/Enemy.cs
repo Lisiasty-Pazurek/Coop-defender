@@ -153,18 +153,23 @@ public class Enemy : NetworkBehaviour
     public void TakeDamage(int amount)
     {
         enemyHealth -= amount;
-        EnemyDie();
+        StartCoroutine(EnemyDie());
     } 
 
     [Server]
-    public void EnemyDie ()
+    public IEnumerator EnemyDie ()
     {
         if (enemyHealth <= 0) {
         isAlive = false;
         // last hit for scoring point, not giving score if shot by another enemy 
-        if (lastShooter.GetComponent<PlayerScore>() != null) { lastShooter.GetComponent<PlayerScore>().score +=1;} 
+        if (lastShooter.GetComponent<PlayerScore>() != null) 
+        { lastShooter.GetComponent<PlayerScore>().score +=1;} 
+        
+        yield return new WaitForEndOfFrame();
+        //  NetworkServer.Spawn(deadbody); -- let people see some "positive feedback"", need some additional models/animations/else        
         NetworkServer.Destroy(gameObject);
-        //  NetworkServer.Spawn(deadbody); -- let people see some "positive feedback"", need some additional models/animations/else
+
+    
         }
     }
 

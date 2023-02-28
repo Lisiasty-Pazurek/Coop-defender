@@ -10,7 +10,7 @@ public class PlayerMovementController : NetworkBehaviour
     [SerializeField] [SyncVar (hook = nameof(ChangeHealth))] public int playerHealth = 5;
     [SerializeField] private float movementSpeed = 5f;
     [SerializeField] private float rotationSpeed = 6f;
-    [SerializeField] private float reloadTime = .2f;
+    [SerializeField] private float reloadTime = .4f;
 
     [Header ("Prefabs")]
     [SerializeField] private GameObject bulletPrefab;
@@ -25,7 +25,7 @@ public class PlayerMovementController : NetworkBehaviour
 
     [Header("Attributes")]
     [SyncVar]public bool isAlive = false;    
-    private float reloadCD;
+    [SerializeField] [SyncVar]public float reloadCD; // for debugging
     private bool isGrounded; //something is bugged
 
     [Header("Debugging")]
@@ -42,9 +42,6 @@ public class PlayerMovementController : NetworkBehaviour
         pcAnimator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
         uiHandler = GameObject.FindObjectOfType<UIHandler>();
-        // Disable cursor and hide it - not necessary, can be useful for nice looking one 
-        // Cursor.lockState = CursorLockMode.Locked;
-        // Cursor.visible = false;
     }
 
     public override void OnStartServer()
@@ -87,8 +84,11 @@ public class PlayerMovementController : NetworkBehaviour
         if (Input.GetButtonDown("Fire1") )
         {
             CmdFire();
+            Debug.Log("pew pew");
+            reloadCD = reloadTime;        // wy not work? - if it is here - becasue scipt is set up to sync from client to server
         }
 
+        // prolly should change logic to make it server side
         reloadCD -= Time.deltaTime;
     }
 
@@ -123,24 +123,27 @@ public class PlayerMovementController : NetworkBehaviour
     {
         if (reloadCD <= 0) 
         {
-        // Diff weapons = diff bullets. New class might be usefull, also.. shooting cooldown 
-        // Instantiate bullet prefab at spawn point position and rotation
-        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
+            // Diff weapons = diff bullets. New class might be usefull, also.. shooting cooldown 
+            Shoot();
+        }
 
+    }
+
+    [Server]
+    public void Shoot ()
+    {        
+
+        Debug.Log("reloading for: " + reloadCD + "/" + reloadTime);
+        // Instantiate bullet prefab at spawn point position and rotation        
+        GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
         // Spawn bullet on server and clients
         NetworkServer.Spawn(bullet);
         bullet.GetComponent<Bullet>().shooter = this.gameObject;
         // Apply force to bullet in the direction the player is facing
         bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bullet.GetComponent<Bullet>().bulletSpeed);
-
-
-
-        reloadCD = reloadTime;
-        }
-
     }
 
-    [ServerCallback]
+//    [ServerCallback]
     private void OnTriggerEnter(Collider other)
     {
         //Check if get hit by bullet
@@ -150,10 +153,11 @@ public class PlayerMovementController : NetworkBehaviour
             if (bullet.canDamagePlayer)
             // Apply damage to player 
             TakeDamage(bullet.damageAmount);
+            Debug.Log("Got shot! " + netId);
         }
     }
 
-    [Server]
+//    [Server]
     void TakeDamage(int amount)
     {
         if (!isAlive) {return;}
@@ -162,18 +166,19 @@ public class PlayerMovementController : NetworkBehaviour
         {   
             StartCoroutine(PlayerWounded());
         }
+        Debug.Log("Got hit! " + netId);
     }
 
     // Death/healing/respawn
-    [Server]
+//    [Server]
     public IEnumerator PlayerWounded()
     {
         isAlive = false;
-
+        Debug.Log("Need a medic! " + netId);
         // need some visual feedback with animator but works as intended
         while (isAlive == false)
         {
-            yield return new WaitForSeconds(6f); 
+            yield return new WaitForSeconds(8f); 
             
             isAlive = true;
         }
