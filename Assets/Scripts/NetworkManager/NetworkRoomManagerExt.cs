@@ -1,18 +1,20 @@
 using UnityEngine;
 using Mirror;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
 	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkManager.html
 */
 
-    [AddComponentMenu("")]
+[AddComponentMenu("")]
     public class NetworkRoomManagerExt : NetworkRoomManager
     {
 
         public static new NetworkRoomManagerExt singleton { get; private set; }
 
+        public LobbySystem lobbySystem;
         /// <summary>
         /// Runs on both Server and Client
         /// Networking is NOT initialized when this fires
@@ -92,5 +94,29 @@ using UnityEngine.UI;
                 ServerChangeScene(GameplayScene);
             }
         }
+
+
+
+    public override void OnClientConnect()
+    {
+        lobbySystem.lobbyPanel.gameObject.SetActive(false);
+        base.OnClientConnect();
+    }
+
+    public override void OnClientDisconnect()
+    {
+        lobbySystem.lobbyPanel.gameObject.SetActive(true);
+        lobbySystem.RefreshServerList();
+        base.OnClientDisconnect();
+    }
+
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        if(lobbySystem.LRMTransport.ClientConnected())
+        lobbySystem.LRMTransport.DisconnectFromRelay();
+        SceneManager.LoadScene("LobbySample");
+        Destroy(this.gameObject);
+    }
     }
 
