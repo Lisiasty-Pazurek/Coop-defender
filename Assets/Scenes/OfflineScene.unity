@@ -273,7 +273,6 @@ GameObject:
   - component: {fileID: 2008127830}
   - component: {fileID: 2008127835}
   - component: {fileID: 2008127834}
-  - component: {fileID: 2008127839}
   - component: {fileID: 2008127840}
   - component: {fileID: 2008127842}
   - component: {fileID: 2008127841}
@@ -398,6 +397,8 @@ MonoBehaviour:
   - {fileID: 2928675826010894138, guid: 4d3d5c5a290feb54b803e566234f53e8, type: 3}
   - {fileID: 945784786697987653, guid: 7455f6066933281469d28ff832f452bf, type: 3}
   - {fileID: 945784786697987653, guid: 47eb851661562eb42a1bd6b66f2cfacf, type: 3}
+  - {fileID: 3679515150854564816, guid: 6490a0a9a4ec31f4ea7828635bc7c96d, type: 3}
+  - {fileID: 1331695582238466739, guid: d47ca6f70b07cfb48b50a1f555e609bf, type: 3}
   timeInterpolationGui: 0
   showRoomGUI: 1
   minPlayers: 1
@@ -407,20 +408,6 @@ MonoBehaviour:
   _allPlayersReady: 0
   roomSlots: []
   clientIndex: 0
---- !u!114 &2008127839
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2008127829}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  offsetX: 0
-  offsetY: 0
 --- !u!114 &2008127840
 MonoBehaviour:
   m_ObjectHideFlags: 0

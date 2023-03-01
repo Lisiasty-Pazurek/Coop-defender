@@ -9,17 +9,20 @@ public class UIHandler : MonoBehaviour
     [SerializeField] public Text scoreText;    
 
 
-    public void ChangeHealth(string amount)
+    public void ChangeHealth(string hpAmount)
     {
-        healthText.text = amount;
+        healthText.text = hpAmount;
     }
 
-    public void ChangeScore (string amount)
+    public void ChangeScore (string scoreAmount)
     {
-        scoreText.text = amount;
+        scoreText.text = scoreAmount;
     }
 
-    
+    public void ChangeCountdown()
+    {
+//        countdown.text = countText;
+    }
 
     public void RestartLevel ()
     {

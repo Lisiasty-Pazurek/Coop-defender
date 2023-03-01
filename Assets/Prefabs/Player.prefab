@@ -140,11 +140,12 @@ GameObject:
   - component: {fileID: 7637685175608504170}
   - component: {fileID: 7209877234199970504}
   - component: {fileID: 529371642384062730}
+  - component: {fileID: 4590984573424585472}
   - component: {fileID: 3161827005819108190}
   - component: {fileID: -5233812888517390236}
+  - component: {fileID: -1266684619568618356}
   - component: {fileID: -2385147783297686865}
   - component: {fileID: 6223180428799467715}
-  - component: {fileID: -1266684619568618356}
   - component: {fileID: 7358854852308795890}
   m_Layer: 0
   m_Name: Player
@@ -203,17 +204,34 @@ MonoBehaviour:
   syncDirection: 1
   syncMode: 0
   syncInterval: 0.1
-  playerHealth: 5
-  movementSpeed: 3
+  movementSpeed: 4
   rotationSpeed: 3
-  reloadTime: 0.4
+  reloadTime: 0.25
   bulletPrefab: {fileID: 945784786697987653, guid: 7455f6066933281469d28ff832f452bf, type: 3}
   bulletSpawnPoint: {fileID: 5154872357061691754}
-  uiHandler: {fileID: 0}
+  health: {fileID: 4590984573424585472}
   pcAnimator: {fileID: 5863474957185472346}
-  isAlive: 0
+  reloadCD: 0
   movement: {x: 0, y: 0, z: 0}
   rotation: {x: 0, y: 0, z: 0}
+--- !u!114 &4590984573424585472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6239893102336994761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2819ddd19c04aea4881098ec28dc58b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
+  playerHealth: 5
+  isAlive: 0
+  uiHandler: {fileID: 0}
 --- !u!54 &3161827005819108190
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -245,6 +263,24 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
+--- !u!114 &-1266684619568618356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6239893102336994761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6e9c5638c6be83499eac2a76ff4831e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0.1
+  index: 0
+  score: 0
+  uiHandler: {fileID: 0}
 --- !u!114 &-2385147783297686865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,24 +312,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &-1266684619568618356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6239893102336994761}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6e9c5638c6be83499eac2a76ff4831e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0.1
-  index: 0
-  score: 0
-  uiHandler: {fileID: 0}
 --- !u!114 &7358854852308795890
 MonoBehaviour:
   m_ObjectHideFlags: 0

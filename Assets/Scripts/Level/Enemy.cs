@@ -165,10 +165,10 @@ public class Enemy : NetworkBehaviour
         if (lastShooter.GetComponent<PlayerScore>() != null) 
         { lastShooter.GetComponent<PlayerScore>().score +=1;} 
         
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(.1f); // Debug to avoid null reference
         //  NetworkServer.Spawn(deadbody); -- let people see some "positive feedback"", need some additional models/animations/else        
         NetworkServer.Destroy(gameObject);
-
+        yield break;
     
         }
     }

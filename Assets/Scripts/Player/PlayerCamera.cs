@@ -24,5 +24,25 @@ using Mirror;
             Debug.Log("cinemachine cam follow set up for local client");
         }
 
+        [Client]
+        private void Update() 
+        {
+            // Camera distance and rotation
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+//                cineCam.
+            }
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+//                cineCam.
+            }
+            if (Input.mouseScrollDelta != null)
+            {
+//                cineCam.               
+            }
+
+        }
+
+
     }
 

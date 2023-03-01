@@ -7,7 +7,6 @@ using Mirror;
 public class PlayerMovementController : NetworkBehaviour
 {   
     [Header ("Settings")]
-    [SerializeField] [SyncVar (hook = nameof(ChangeHealth))] public int playerHealth = 5;
     [SerializeField] private float movementSpeed = 5f;
     [SerializeField] private float rotationSpeed = 6f;
     [SerializeField] private float reloadTime = .4f;
@@ -17,15 +16,15 @@ public class PlayerMovementController : NetworkBehaviour
     [SerializeField] private Transform bulletSpawnPoint;
 
     [Header ("References")]
-    public UIHandler uiHandler;
+    public Health health;
     private Rigidbody rb;
     private Camera cam;
 //    public GameSession gameSession;
     public Animator pcAnimator;
 
     [Header("Attributes")]
-    [SyncVar]public bool isAlive = false;    
-    [SerializeField] [SyncVar]public float reloadCD; // for debugging
+
+    [SerializeField] [SyncVar]public float reloadCD; // for debugging - going to pass it to bullet
     private bool isGrounded; //something is bugged
 
     [Header("Debugging")]
@@ -41,20 +40,23 @@ public class PlayerMovementController : NetworkBehaviour
         FindObjectOfType<GameSession>().playerController = this;
         pcAnimator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
-        uiHandler = GameObject.FindObjectOfType<UIHandler>();
+        health = GetComponent<Health>();
+
+
     }
 
     public override void OnStartServer()
     {
         base.OnStartServer();
-        //Get some basic references for rb and ui handler
+        //Get some basic references 
         rb = GetComponent<Rigidbody>();
+        health = GetComponent<Health>();
         pcAnimator = GetComponentInChildren<Animator>();
 
     }
 
     private void Update() 
-    {        if (!isAlive || !isLocalPlayer)  { return;}
+    {       if (!health.isAlive || !isLocalPlayer)  { return;}
 
             RotateTowardsCursor();
 
@@ -132,8 +134,7 @@ public class PlayerMovementController : NetworkBehaviour
     [Server]
     public void Shoot ()
     {        
-
-        Debug.Log("reloading for: " + reloadCD + "/" + reloadTime);
+//        Debug.Log("reloading for: " + reloadCD + "/" + reloadTime);
         // Instantiate bullet prefab at spawn point position and rotation        
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
         // Spawn bullet on server and clients
@@ -143,7 +144,7 @@ public class PlayerMovementController : NetworkBehaviour
         bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bullet.GetComponent<Bullet>().bulletSpeed);
     }
 
-//    [ServerCallback]
+
     private void OnTriggerEnter(Collider other)
     {
         //Check if get hit by bullet
@@ -152,49 +153,8 @@ public class PlayerMovementController : NetworkBehaviour
             Bullet bullet = other.GetComponent<Bullet>();
             if (bullet.canDamagePlayer)
             // Apply damage to player 
-            TakeDamage(bullet.damageAmount);
-            Debug.Log("Got shot! " + netId);
+            health.TakeDamage(bullet.damageAmount);
         }
     }
-
-//    [Server]
-    void TakeDamage(int amount)
-    {
-        if (!isAlive) {return;}
-        playerHealth -= amount;
-        if (playerHealth <= 0)
-        {   
-            StartCoroutine(PlayerWounded());
-        }
-        Debug.Log("Got hit! " + netId);
-    }
-
-    // Death/healing/respawn
-//    [Server]
-    public IEnumerator PlayerWounded()
-    {
-        isAlive = false;
-        Debug.Log("Need a medic! " + netId);
-        // need some visual feedback with animator but works as intended
-        while (isAlive == false)
-        {
-            yield return new WaitForSeconds(8f); 
-            
-            isAlive = true;
-        }
-
-        playerHealth = 5;
-        
-        
-    }
-
-
-    [ServerCallback]
-    public void ChangeHealth(int oldValue, int newValue)
-    {
-        if (!isLocalPlayer) {return;}
-        uiHandler.ChangeHealth(playerHealth.ToString());
-    }
-
     
 }

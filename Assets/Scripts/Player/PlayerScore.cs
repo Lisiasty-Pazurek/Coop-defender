@@ -11,11 +11,11 @@ public class PlayerScore : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
-        uiHandler = this.GetComponentInParent<PlayerMovementController>().uiHandler;
+        uiHandler = FindObjectOfType<UIHandler>();
     }
 
-[Server]
-    public void ScoreChange(int oldValue, int newValue)
+
+    public void ScoreChange(int lastScore, int currentScore)
     {
         if (!isLocalPlayer) {return;}
         ChangeUIScore();
@@ -24,6 +24,7 @@ public class PlayerScore : NetworkBehaviour
 
     void ChangeUIScore()
     {
+        if (!isLocalPlayer) {return;}
         uiHandler.ChangeScore(score.ToString());
     }
 

@@ -9,12 +9,14 @@ public class GameSession : NetworkBehaviour
 {
     [Header("Game Settings")]
     public float gameDuration = 180f;
-    [SerializeField] public float countdownDuration = 3f;
+    [SerializeField] public float countdownDuration = 3;
+    [SerializeField] public GameObject scorePrefab;
 
     [Header("UI Elements")]
+    [SyncVar] public float countdownTimer;    
     public Text countdownText;
     public Text gametimeText;
-    [SyncVar] private float countdownTimer;
+    [SerializeField] public Transform scoreboardGrid;
     private float gameTimer;
     public bool gameEnded;
 
@@ -22,6 +24,7 @@ public class GameSession : NetworkBehaviour
 
     [Header("References")]
     public PlayerMovementController playerController;
+    
     public UIHandler uiHandler;
 
 
@@ -36,6 +39,7 @@ public class GameSession : NetworkBehaviour
         countdownTimer = countdownDuration;
         gameTimer = gameDuration;
         gameEnded = false;
+        StartCoroutine(Countdown());
     }
 
     public override void OnStartLocalPlayer()
@@ -48,41 +52,44 @@ public class GameSession : NetworkBehaviour
     [ServerCallback]
     private void Update()
     {
-        if (gameEnded) {return;}
-
-        // Countdown before game starts
-        if (countdownTimer > 0f)
-        {
-            countdownTimer -= Time.deltaTime;
-            int secondsLeft = Mathf.CeilToInt(countdownTimer);
-            if (secondsLeft != Mathf.CeilToInt(countdownTimer))
-            {
-                RpcUpdateCountdown(secondsLeft);
-            }
-
-            if (countdownTimer <= 0f)
-            {
-                RpcDisableCountdown();
-                RpcEnablePlayerController();
-            }
-        }
-        else
-        {
+        if (gameEnded || countdownTimer >0) {return;}
             // Game is in progress
             gameTimer -= Time.deltaTime;
+
             RpcUpdateGameTimer(Convert.ToInt32(gameTimer));
             if (gameTimer <= 0f)
             {
                 EndGame();
             }
+        
+    }
+
+    [Server]
+    public IEnumerator Countdown()
+    {
+        countdownText.gameObject.SetActive(true); // why is it disabling itself?!
+        while (countdownTimer >= 0)
+        {
+            yield return new WaitForSecondsRealtime(1);
+            int secondsLeft = Mathf.CeilToInt(countdownTimer);
+            RpcUpdateCountdown(secondsLeft);
+            countdownTimer-= 1;
         }
+
+        if (countdownTimer < 0f)
+        {
+            RpcDisableCountdown();
+            RpcEnablePlayerController(true);
+            yield break;
+        }
+        
     }
 
     [ClientRpc]
     private void RpcUpdateCountdown(int secondsLeft)
     {
         countdownText.text = secondsLeft.ToString();
-        Debug.Log(secondsLeft);
+        
     }
 
     [ClientRpc]
@@ -94,14 +101,13 @@ public class GameSession : NetworkBehaviour
     [ClientRpc]
     private void RpcDisableCountdown()
     {
-        countdownText.gameObject.SetActive(false);
+        countdownText.enabled = false;
     }
 
     [ClientRpc]
-    public void RpcEnablePlayerController()
+    public void RpcEnablePlayerController(bool state)
     {
-        playerController.isAlive = true;
-        
+        playerController.health.isAlive = state;     
     }
 
     [Server]
@@ -111,24 +117,34 @@ public class GameSession : NetworkBehaviour
 
         Debug.Log("Game ended");
         // Display scoreboard
-        
-        foreach (PlayerMovementController player in FindObjectsOfType<PlayerMovementController>())
-        {
-            player.isAlive = false;
-        }
 
         foreach (Enemy enemy in FindObjectsOfType<Enemy>())
         {
-            enemy.isAlive = false;
+            enemy.gameObject.SetActive(false);
         }
 
         RpcEndgame ();
+        RpcEnablePlayerController(false);
+        DisplayScore();
+    }
 
+    [Server]
+    void DisplayScore()
+    {
+        Debug.Log("spawning score prefabs");
+        foreach (PlayerScore player in FindObjectsOfType<PlayerScore>())
+        {
+            GameObject scorerow = Instantiate(scorePrefab, scoreboardGrid);            
+            NetworkServer.Spawn(scorerow);
+            scorerow.GetComponent<Text>().text = " Player id: "  + player.netId  + " score: " + player.score + "";
+
+        }
     }
 
     [ClientRpc]
     public void RpcEndgame ()
     {
+
         postGameWindow.enabled = true;
         //need to add scoreboard here once connectivity issues will be fixed
     }
