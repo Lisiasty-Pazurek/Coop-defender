@@ -21,6 +21,7 @@ public class Health : NetworkBehaviour
         uiHandler = FindObjectOfType<UIHandler>();
     }
 
+  
     public void TakeDamage(int damageAmount)
     {
         if (!isAlive || !isLocalPlayer) {return;}
@@ -33,6 +34,7 @@ public class Health : NetworkBehaviour
     }
 
     // Death/healing/respawn -- maybe some additional ressurecting interaction
+
 
     public IEnumerator PlayerWounded()
     {
@@ -50,6 +52,7 @@ public class Health : NetworkBehaviour
     }
 
 // not working as it should on client
+    
     public void ChangeHealth(int lastHP, int currentHP)
     {
         if (!isLocalPlayer) {return;}
@@ -59,7 +62,7 @@ public class Health : NetworkBehaviour
 
     void ChangeUIHealth()
     {
-//        if (!isLocalPlayer) {return;}
+        if (!isLocalPlayer) {return;}
         uiHandler.ChangeHealth(playerHealth.ToString());
     }
 
