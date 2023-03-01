@@ -23,10 +23,13 @@ public class Enemy : NetworkBehaviour
 
     [Header ("References")]
     public NavMeshAgent enemyNavigator;
-    public GameObject enemyTarget = null;
+    public GameObject enemyTarget;
+    public GameObject[] players;    
     [SerializeField] GameObject defensePoint = null;
     private EnemySpawner enemySpawner;
     private GameObject lastShooter;
+
+
 
     public override void OnStartServer()
     {
@@ -36,6 +39,8 @@ public class Enemy : NetworkBehaviour
         defensePoint = GameObject.FindGameObjectWithTag("defensePoint");
         isAlive = true;
         AsssignTarget();
+
+
     }
 
     public override void OnStartClient()
@@ -47,24 +52,42 @@ public class Enemy : NetworkBehaviour
     private void Update ()
     {
         if (!isAlive) {return;}
-        MoveToTarget();
+        if (enemyTarget == null) {AsssignTarget();}
+        if (enemyTarget != null) {MoveToTarget();}
         reloadCD -= Time.deltaTime;
     }
+
+
 
     [Server]
     public void AsssignTarget ()
     {
-        // it will always find 1 player in hierarchy, good enough if there is only one connected player
-        enemyTarget = GameObject.FindGameObjectWithTag("Player");
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        //Using Dictionary to store pairs of player gameobject and distances
 
-        // looking for workaround to follow player that is closer
-        if (NetworkServer.connections.Count > 1)
-        {
-            foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+            Dictionary<GameObject, float> distances = new Dictionary<GameObject, float>();            
+            foreach (GameObject player in players)
             {
                 float distance = Vector3.Distance(this.transform.position, player.transform.position);
+                distances.Add(player, distance);
             }
-        }
+
+            float shortestDistance = Mathf.Infinity;
+            GameObject closestObject = null;
+
+            foreach (KeyValuePair<GameObject, float> pair in distances)
+            {
+                if (pair.Value < shortestDistance)
+                {
+                    shortestDistance = pair.Value;
+                    closestObject = pair.Key;
+                }
+            }
+
+            if (closestObject != null)
+            {
+                enemyTarget = closestObject;
+            }
         
         // Players are dead, waiting for respawn, or too far away, also.. can be swapped to additonal trigger collider for checking again
  //       if (enemyTarget = null) { enemyTarget = defensePoint;}
@@ -139,7 +162,7 @@ public class Enemy : NetworkBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //Check if get hit by bullet
-        if (other.GetComponent<Bullet>() != null)
+        if (other.GetComponent<Bullet>() != null && isAlive)
         {
             Bullet bullet = other.GetComponent<Bullet>();
             if (bullet.canDamageEnemy)
