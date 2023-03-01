@@ -137,12 +137,14 @@ public class PlayerMovementController : NetworkBehaviour
 //        Debug.Log("reloading for: " + reloadCD + "/" + reloadTime);
         // Instantiate bullet prefab at spawn point position and rotation        
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
-        // Spawn bullet on server and clients
+        // Spawn bullet on server and clients <- dont do this as networked object, RPC visuals without rb/network identity etc.
         NetworkServer.Spawn(bullet);
         bullet.GetComponent<Bullet>().shooter = this.gameObject;
         // Apply force to bullet in the direction the player is facing
         bullet.GetComponent<Rigidbody>().AddForce(transform.forward * bullet.GetComponent<Bullet>().bulletSpeed);
     }
+
+
 
 
     private void OnTriggerEnter(Collider other)
