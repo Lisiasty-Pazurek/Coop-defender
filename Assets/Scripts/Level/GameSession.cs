@@ -152,12 +152,6 @@ public class GameSession : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-
-        // Disable the countdown UI for non-local players
-        if (!isLocalPlayer)
-        {
-            countdownText.gameObject.SetActive(false);
-        }
     }
 
     public override void OnStopClient()

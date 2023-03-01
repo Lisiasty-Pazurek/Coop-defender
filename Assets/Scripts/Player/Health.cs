@@ -59,7 +59,7 @@ public class Health : NetworkBehaviour
 
     void ChangeUIHealth()
     {
-        if (!isLocalPlayer) {return;}
+//        if (!isLocalPlayer) {return;}
         uiHandler.ChangeHealth(playerHealth.ToString());
     }
 
