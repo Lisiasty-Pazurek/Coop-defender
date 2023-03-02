@@ -1,4 +1,4 @@
-# Wild-west
+# Wild-West
  Practice coop twin stick shooter
 
 5 day marathon
