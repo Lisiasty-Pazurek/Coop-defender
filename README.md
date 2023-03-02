@@ -1,4 +1,4 @@
-# Coop-defender
+# Wild-west
  Practice coop twin stick shooter
 
 5 day marathon
