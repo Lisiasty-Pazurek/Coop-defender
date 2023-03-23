@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace LightReflectiveMirror
 {
-    class BiDictionary<TFirst, TSecond>
+    public class BiDictionary<TFirst, TSecond>
     {
         IDictionary<TFirst, TSecond> firstToSecond = new Dictionary<TFirst, TSecond>();
         IDictionary<TSecond, TFirst> secondToFirst = new Dictionary<TSecond, TFirst>();

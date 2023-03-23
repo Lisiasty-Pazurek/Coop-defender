@@ -50,7 +50,7 @@ namespace LightReflectiveMirror
 
         public LRMRegions region = LRMRegions.NorthAmerica;
         private byte[] _clientSendBuffer;
-        private bool _connectedToRelay = false;
+        public bool _connectedToRelay = false;
         private bool _isClient = false;
         private bool _isServer = false;
         private bool _directConnected = false;
@@ -65,7 +65,7 @@ namespace LightReflectiveMirror
         private IPEndPoint _directConnectEndpoint;
         private SocketProxy _clientProxy;
         private BiDictionary<IPEndPoint, SocketProxy> _serverProxies = new BiDictionary<IPEndPoint, SocketProxy>();
-        private BiDictionary<int, int> _connectedRelayClients = new BiDictionary<int, int>();
+        public BiDictionary<int, int> _connectedRelayClients = new BiDictionary<int, int>();
         private BiDictionary<int, int> _connectedDirectClients = new BiDictionary<int, int>();
         private bool _serverListUpdated = false;
     }

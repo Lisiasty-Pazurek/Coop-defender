@@ -12,8 +12,9 @@ namespace LightReflectiveMirror
     [DefaultExecutionOrder(1001)]
     public partial class LightReflectiveMirrorTransport : Transport
     {
+        public string lobbyName;
+        public int clientID;
         public bool IsAuthenticated() => _isAuthenticated;
-
         private void Awake()
         {
             if (Application.platform == RuntimePlatform.WebGLPlayer)
@@ -168,6 +169,7 @@ namespace LightReflectiveMirror
                     case OpCodes.Authenticated:
                         // Server authenticated us! That means we are fully ready to host and join servers.
                         serverStatus = "Authenticated! Good to go!";
+                        clientID = data.ReadInt(ref pos);
                         _isAuthenticated = true;
                         RequestServerList();
                         break;
@@ -185,8 +187,8 @@ namespace LightReflectiveMirror
                         // If we are the server and the client is registered, invoke the callback
                         if (_isServer)
                         {
-                            if (_connectedRelayClients.TryGetByFirst(data.ReadInt(ref pos), out int clientID))
-                                OnServerDataReceived?.Invoke(clientID, new ArraySegment<byte>(recvData), channel);
+                            if (_connectedRelayClients.TryGetByFirst(data.ReadInt(ref pos), out int clientID2))
+                                OnServerDataReceived?.Invoke(clientID2, new ArraySegment<byte>(recvData), channel);
                         }
 
                         // If we are the client, invoke the callback
@@ -209,9 +211,9 @@ namespace LightReflectiveMirror
                         {
                             // Get their client ID and invoke the mirror callback
                             int user = data.ReadInt(ref pos);
-                            if (_connectedRelayClients.TryGetByFirst(user, out int clientID))
+                            if (_connectedRelayClients.TryGetByFirst(user, out int clientID2))
                             {
-                                OnServerDisconnected?.Invoke(clientID);
+                                OnServerDisconnected?.Invoke(clientID2);
                                 _connectedRelayClients.Remove(user);
                             }
                         }
@@ -313,6 +315,27 @@ namespace LightReflectiveMirror
                             _NATPuncher.BeginReceive(new AsyncCallback(RecvData), _NATPuncher);
                         }
                         break;
+                    case OpCodes.GetID:
+                        clientID = data.ReadInt(ref pos);
+                        break;
+                    case OpCodes.GetPlayerInfo:
+
+                        int playerClientID = data.ReadInt(ref pos);
+                        string playerName = data.ReadString(ref pos);
+                        int playerGroupID = data.ReadInt(ref pos);
+                        bool playerIsModerator = data.ReadBool(ref pos);
+
+                        PlayerAccountInfo[] playerAccounts = FindObjectsOfType<PlayerAccountInfo>();
+                        for (int i = 0; i < playerAccounts.Length; i++)
+                        {
+                            if((int)playerAccounts[i].playerClientID == playerClientID)
+                            {
+                                playerAccounts[i].SetPlayerInfoValues(playerName, playerGroupID, playerIsModerator);
+                                i = playerAccounts.Length;
+                            }
+                        }
+
+                        break;
                 }
             }
             catch (Exception e) { print(e); }
@@ -409,12 +432,31 @@ namespace LightReflectiveMirror
             return null;
         }
 
+        public string authenticationCredentials = "";
         private void SendAuthKey()
         {
             int pos = 0;
             _clientSendBuffer.WriteByte(ref pos, (byte)OpCodes.AuthenticationResponse);
+            if(authenticationCredentials.Length>1)
+            _clientSendBuffer.WriteString(ref pos, authenticationCredentials);
+            else
             _clientSendBuffer.WriteString(ref pos, authenticationKey);
 
+            clientToServerTransport.ClientSend(new ArraySegment<byte>(_clientSendBuffer, 0, pos), 0);
+        }
+
+        private void RequestClientID()
+        {
+            int pos = 0;
+            _clientSendBuffer.WriteByte(ref pos, (byte)OpCodes.RequestID);
+            clientToServerTransport.ClientSend(new ArraySegment<byte>(_clientSendBuffer, 0, pos), 0);
+        }
+
+        public void RequestPlayerInfo(int playerClientID)
+        {
+            int pos = 0;
+            _clientSendBuffer.WriteByte(ref pos, (byte)OpCodes.RequestPlayerInfo);
+            _clientSendBuffer.WriteInt(ref pos, playerClientID);
             clientToServerTransport.ClientSend(new ArraySegment<byte>(_clientSendBuffer, 0, pos), 0);
         }
 
@@ -422,7 +464,7 @@ namespace LightReflectiveMirror
         {
             Default = 0, RequestID = 1, JoinServer = 2, SendData = 3, GetID = 4, ServerJoined = 5, GetData = 6, CreateRoom = 7, ServerLeft = 8, PlayerDisconnected = 9, RoomCreated = 10,
             LeaveRoom = 11, KickPlayer = 12, AuthenticationRequest = 13, AuthenticationResponse = 14, Authenticated = 17, UpdateRoomData = 18, ServerConnectionData = 19, RequestNATConnection = 20,
-            DirectConnectIP = 21
+            DirectConnectIP = 21, RequestPlayerInfo = 22, GetPlayerInfo = 23
         }
 
         private static string GetLocalIp()

@@ -122,7 +122,7 @@ namespace LightReflectiveMirror
         {
             if (!useLoadBalancer)
             {
-                string uri = $"http://{serverIP}:{endpointServerPort}/api/compressed/servers";
+                string uri = $"http://{serverIP}:{endpointServerPort}/api/compressed/servers?lobbyName="+lobbyName;
 
                 using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
                 {

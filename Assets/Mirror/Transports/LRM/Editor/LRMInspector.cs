@@ -40,6 +40,9 @@ namespace LightReflectiveMirror
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
+            //EditorGUILayout.PropertyField(serializedObject.FindProperty("_connectedRelayClients"));
+
+
             if (string.IsNullOrEmpty(lrm.loadBalancerAddress))
             {
                 // First setup screen, ask if they are using LLB or just a single LRM node.
@@ -243,6 +246,7 @@ namespace LightReflectiveMirror
                                 GUI.enabled = true;
                             }
 
+                            lrm.lobbyName = EditorGUILayout.TextField("LRM App ID", lrm.lobbyName);
                             lrm.authenticationKey = EditorGUILayout.TextField("LRM Auth Key", lrm.authenticationKey);
                             lrm.heartBeatInterval = EditorGUILayout.Slider("Heartbeat Time", lrm.heartBeatInterval, 0.1f, 5f);
                             lrm.connectOnAwake = EditorGUILayout.Toggle("Connect on Awake", lrm.connectOnAwake);

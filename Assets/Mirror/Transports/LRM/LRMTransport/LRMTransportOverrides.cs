@@ -198,6 +198,7 @@ namespace LightReflectiveMirror
             _clientSendBuffer.WriteString(ref pos, serverName);
             _clientSendBuffer.WriteBool(ref pos, isPublicServer);
             _clientSendBuffer.WriteString(ref pos, extraServerData);
+            _clientSendBuffer.WriteString(ref pos, lobbyName);
 
             // If we have direct connect module, and our local IP isnt null, tell server. Only time local IP is null is on cellular networks, such as IOS and Android.
             _clientSendBuffer.WriteBool(ref pos, _directConnectModule != null ? GetLocalIp() != null : false);

@@ -5778,6 +5778,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7064b1b1d0671194baf55fa8d5f564d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lobbyName: WildWest
+  clientID: 0
+  authenticationCredentials: 
   clientToServerTransport: {fileID: 1837505414}
   serverIP: 194.195.240.79
   serverPort: 7777
@@ -5842,6 +5845,7 @@ MonoBehaviour:
   serverStatus: Not Started.
   serverId: 
   region: 1
+  _connectedToRelay: 0
 --- !u!1 &2050537889
 GameObject:
   m_ObjectHideFlags: 0
